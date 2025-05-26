@@ -2,7 +2,7 @@
   <div class="welcome">
     <LogoIcon ref="logo" class="logo" :width="width" :height="height" @click="toggleCrazyEyes" />
     <h1 class="welcome-text">
-      Hi I'm <strong>Alex</strong>,
+      Hi 👋 I'm <strong>Alex</strong>,
       <span>aka <a href="https://github.com/TheNerdMan" target="_blank">TheNerdMan</a>,</span>
       <span>aka <strong>Nerdie</strong>,</span>
       <span>aka <strong>Nerd</strong></span>
