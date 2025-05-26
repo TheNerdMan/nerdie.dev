@@ -117,7 +117,7 @@
 
 <script lang="ts" setup>
 import type { NumberRange } from '@/utils/types/NumberRange.type';
-import { computed, ref, shallowRef } from 'vue';
+import { computed, onMounted, ref, shallowRef } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -245,7 +245,9 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-animate();
+onMounted(() => {
+  animate();
+});
 
 // Compute SVG center in SVG coordinates using viewBox
 

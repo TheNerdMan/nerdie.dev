@@ -33,7 +33,9 @@ function toggleCrazyEyes() {
   }
 }
 
-const mq = computed(() => window.matchMedia('(max-width: 600px)'));
+const mq = computed(() =>
+  typeof window !== 'undefined' ? window.matchMedia('(max-width: 600px)') : { matches: false },
+);
 const width = computed(() => {
   return mq.value.matches ? 200 : 100;
 });
