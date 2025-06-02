@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="blog-header">
     <h1>
       Sometimes I write things, however most of the time my opinion has changed since writing them
     </h1>
@@ -86,7 +86,15 @@ function handleBlogClick(blog: BlogFile) {
 </script>
 
 <style scoped>
+.blog-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
 .blog-list {
-  /* Add any specific styles for the blog list if needed */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
 }
 </style>

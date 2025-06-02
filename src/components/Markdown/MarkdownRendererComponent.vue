@@ -1,81 +1,47 @@
 <template>
-  <div>
-    <component
-      v-for="(fragment, idx) in fragments"
-      :key="idx"
-      :is="resolveComponent(fragment)"
-      v-bind="getProps(fragment)"
-    >
-      <template v-if="fragment.children && fragment.children.length">
-        <MarkdownRendererComponent :content="''" :fragments="fragment.children" />
-      </template>
-      <template v-else-if="fragment.content">
-        {{ fragment.content }}
-      </template>
-    </component>
-  </div>
+  <vue-markdown-render
+    class="markdown-body"
+    :source="content"
+    :options="markdownOptions"
+    :plugins="plugins"
+  />
 </template>
 
 <script setup lang="ts">
+import { type Options as MarkdownItOptions } from 'markdown-it';
 import { computed } from 'vue';
-import MarkdownHeading from './MarkdownHeading.vue';
-import MarkdownParagraph from './MarkdownParagraph.vue';
-import MarkdownList from './MarkdownList.vue';
-import MarkdownListItem from './MarkdownListItem.vue';
-import MarkdownCodeBlock from './MarkdownCodeBlock.vue';
-import MarkdownBlockquote from './MarkdownBlockquote.vue';
-import { fragmentMarkdown } from './fragmentMarkdown';
-import type { Fragment } from './fragmentMarkdown';
+import VueMarkdownRender from 'vue-markdown-render';
+import MarkdownItHighlightjs from 'markdown-it-highlightjs';
 
-const props = defineProps<{ content?: string; fragments?: Fragment[] }>();
+defineProps<{ content: string }>();
 
-const fragments = computed(() => {
-  if (props.fragments) return props.fragments;
-  if (props.content) return fragmentMarkdown(props.content);
-  return [];
-});
+const markdownOptions = computed<MarkdownItOptions>(() => ({
+  html: true,
+  linkify: true,
+  typographer: true,
+}));
 
-function resolveComponent(fragment: Fragment) {
-  switch (fragment.type) {
-    case 'heading':
-      return MarkdownHeading;
-    case 'paragraph':
-      return MarkdownParagraph;
-    case 'bullet_list':
-    case 'ordered_list':
-      return MarkdownList;
-    case 'list_item':
-      return MarkdownListItem;
-    case 'blockquote':
-      return MarkdownBlockquote;
-    case 'code_block':
-      return MarkdownCodeBlock;
-    case 'inline':
-      return 'span';
-    case 'hr':
-      return 'hr';
-    case 'link':
-      return 'a';
-    default:
-      return 'div';
-  }
-}
-
-function getProps(fragment: Fragment) {
-  const props: Record<string, unknown> = {};
-  if (fragment.level) props.level = fragment.level;
-  if (fragment.ordered !== undefined) props.ordered = fragment.ordered;
-  if (fragment.type === 'link' && fragment.href) {
-    props.href = fragment.href;
-    props.target = '_blank';
-    props.rel = 'noopener noreferrer';
-  }
-  return props;
-}
+const plugins = computed(() => [MarkdownItHighlightjs]);
 </script>
 
 <style scoped>
-a {
-  display: inline-block;
+@import 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css';
+
+/* Add padding between markdown items */
+.markdown-body :deep(p),
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
+.markdown-body :deep(h3),
+.markdown-body :deep(h4),
+.markdown-body :deep(ul),
+.markdown-body :deep(ol),
+.markdown-body :deep(pre),
+.markdown-body :deep(blockquote),
+.markdown-body :deep(table) {
+  margin-bottom: 1.2em;
+}
+
+.markdown-body :deep(li) {
+  margin-bottom: 0.5em;
 }
 </style>
