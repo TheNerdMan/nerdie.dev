@@ -29,5 +29,5 @@
   "src/main.ts": [],
   "src/router.ts": [],
   "src/views/HomeView.vue?vue&type=script&setup=true&lang.ts": [],
-  "src/views/ToolsView.vue": []
+  "src/views/ToolsView.vue?vue&type=script&setup=true&lang.ts": []
 }
