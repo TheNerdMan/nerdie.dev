@@ -1,6 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { RouterLink } from 'vue-router';
+</script>
 
 <template>
+  <header>
+    <h1>This is a work in progress! Please go back (or remind me to finish it on discord @thenerdman)</h1>
+  </header>
   <main>
     <h1>Tools</h1>
     <h2>I've built</h2>
@@ -15,4 +20,7 @@
       <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">Tool 5</a></li>
     </ul>
   </main>
+  <footer>
+    <RouterLink to="/"> Home </RouterLink>
+  </footer>
 </template>
