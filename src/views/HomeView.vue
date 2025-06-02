@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import HomeComponent from '@/components/HomeComponent.vue'
+import HomeComponent from '@/components/HomeComponent.vue';
 </script>
 
 <template>
   <main>
     <HomeComponent />
-    <p>
-      
-    </p>
+    <div class="links">
+      <RouterLink to="/tools">Tools</RouterLink>
+      <span> | </span>
+      <RouterLink to="/blog">Blogs</RouterLink>
+    </div>
   </main>
 </template>
+
+<style scoped>
+.links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+</style>
