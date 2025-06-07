@@ -11,13 +11,18 @@
           <p v-if="localBlog.date">Published on: {{ localBlog.date }}</p>
           <MarkdownRendererComponent :content="localBlog.content" />
         </div>
+        <transition name="fade-up">
+          <button v-if="showBackToTop && isMobile" class="back-to-top" @click="scrollToTop">
+            Back to top
+          </button>
+        </transition>
       </div>
     </div>
   </transition>
 </template>
 
 <script setup lang="ts">
-import { defineEmits, computed } from 'vue';
+import { defineEmits, computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import type { BlogFile } from '@/utils/types/BlogItem.type';
 import MarkdownRendererComponent from '../Markdown/MarkdownRendererComponent.vue';
@@ -52,6 +57,45 @@ const localBlog = computed({
 function emitClose() {
   localShow.value = false;
 }
+
+function scrollToTop() {
+  const modalContent = document.querySelector('.modal-content');
+  if (modalContent) {
+    modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+const isMobile = ref(false);
+const showBackToTop = ref(false);
+
+function handleScroll() {
+  const modalContent = document.querySelector('.modal-content');
+  if (modalContent) {
+    const scrollTop = modalContent.scrollTop;
+    const scrollHeight = modalContent.scrollHeight - modalContent.clientHeight;
+    showBackToTop.value = scrollHeight > 0 && scrollTop > scrollHeight * 0.05;
+  }
+}
+
+onMounted(() => {
+  // Simple mobile detection (can be improved)
+  isMobile.value =
+    window.matchMedia('(max-width: 600px)').matches || /Mobi|Android/i.test(navigator.userAgent);
+
+  const modalContent = document.querySelector('.modal-content');
+  if (modalContent) {
+    modalContent.addEventListener('scroll', handleScroll);
+  }
+  handleScroll(); // Initial check
+});
+
+// Clean up event listener
+onBeforeUnmount(() => {
+  const modalContent = document.querySelector('.modal-content');
+  if (modalContent) {
+    modalContent.removeEventListener('scroll', handleScroll);
+  }
+});
 </script>
 
 <style scoped>
@@ -123,6 +167,75 @@ function emitClose() {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.fade-up-enter-to,
+.fade-up-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.back-to-top {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 2.5rem;
+  z-index: 1100;
+  background: var(--color-background, #fff);
+  color: var(--color-text, #222);
+  border: 1px solid #ccc;
+  border-radius: 2rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.back-to-top:hover {
+  background: #222;
+  color: #fff;
+}
+@media (max-width: 600px) {
+  .modal-overlay {
+    align-items: stretch;
+    padding: 0;
+  }
+  .card-bottom {
+    border-radius: 0;
+    max-width: 100vw;
+    width: 100vw;
+    max-height: 100vh;
+    height: 100vh;
+    margin-bottom: 0;
+    padding-top: 3.5rem;
+    animation: none;
+  }
+  .modal-close {
+    top: 1.2rem;
+    right: 1.2rem;
+    font-size: 2.2rem;
+  }
+  .back-to-top {
+    bottom: 1.2rem;
+    font-size: 1.1rem;
+    width: calc(100vw - 2rem);
+    left: 1rem;
+    transform: none;
+    border-radius: 1.5rem;
   }
 }
 </style>
