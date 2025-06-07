@@ -1,24 +1,28 @@
+<summary>
+Sharing some of the benefits typescript brings and how it can provide much more safety in APIs. And how it can disguise architecture problems at the root of the cause. 
+</summary>
+
 I recently watched a short form video by [Matt Pocock](https://www.tiktok.com/@mattpocockuk/video/7511069466021661985), in which they suggested the following TypeScript pattern to avoid accidentally mixing up units of a number for example, miles vs. kilometers:
 
 ```ts
 type Kilometer = {
-  type: "kilometer";
+  type: 'kilometer';
   value: number;
 };
 
 type Mile = {
-  type: "mile";
+  type: 'mile';
   value: number;
 };
 
 const miles: Mile = {
-  type: "mile",
+  type: 'mile',
   value: 5,
 };
 
 const convertToKilometers = (miles: Mile): Kilometer => {
   return {
-    type: "kilometer",
+    type: 'kilometer',
     value: miles.value * 1.60934,
   };
 };
@@ -38,7 +42,7 @@ However, I believe that, while type‐branding can be a valid defense against pr
    When someone writes:
 
    ```ts
-   const miles: Mile = { type: "mile", value: 5 };
+   const miles: Mile = { type: 'mile', value: 5 };
    const km: Kilometer = convertToKilometers(miles);
    ```
 
@@ -47,7 +51,7 @@ However, I believe that, while type‐branding can be a valid defense against pr
    ```ts
    // ❌ Error at compile time
    const notAMile = { value: 10 };
-   convertToKilometers(notAMile); 
+   convertToKilometers(notAMile);
    ```
 
    they get an immediate feedback: “Type `{ value: number }` is not assignable to parameter of type `Mile`.” No sneaky runtime bug, no off‐by‐unit error. In a large codebase with cross-team collaboration, that rigidity can be comforting.
@@ -70,9 +74,9 @@ However, I believe that, while type‐branding can be a valid defense against pr
 3. **Preventing a Class of Bugs**
    The classic “I mixed up kilometers and miles” bug can show up in three ways:
 
-   * Calling the wrong converter (e.g. `convertToMiles` when you meant `convertToKilometers`).
-   * Using raw numbers interchangeably (e.g. writing `if (distance > 50)` without knowing whether `distance` is km or mi).
-   * Accidentally storing distances without unit information and then using them inconsistently.
+   - Calling the wrong converter (e.g. `convertToMiles` when you meant `convertToKilometers`).
+   - Using raw numbers interchangeably (e.g. writing `if (distance > 50)` without knowing whether `distance` is km or mi).
+   - Accidentally storing distances without unit information and then using them inconsistently.
 
    By forcing everyone to carry around a “unit tag”, you drastically reduce the chance of those mistakes. That discipline can be particularly valuable in financial, scientific, or logistics applications where unit errors carry serious consequences.
 
@@ -86,15 +90,15 @@ Despite the immediate appeal, wrapping every distance in a `{ type: …; value: 
 
 When you sprinkle value-objects throughout the code, you implicitly acknowledge that:
 
-* Somewhere (maybe the UI, maybe some import process) raw numbers are entering the system without unit metadata.
-* Somewhere else, different parts of the system expect distances in different units.
-* There is no single source of truth for how distances should be represented or converted.
+- Somewhere (maybe the UI, maybe some import process) raw numbers are entering the system without unit metadata.
+- Somewhere else, different parts of the system expect distances in different units.
+- There is no single source of truth for how distances should be represented or converted.
 
 In a better architecture, you would have a clear policy:
 
-* **At the “boundary” (HTTP layer, database layer, file import), parse and interpret distances exactly once.**
+- **At the “boundary” (HTTP layer, database layer, file import), parse and interpret distances exactly once.**
   For example, if your REST API expects all distances in kilometers, the controller should immediately transform any incoming “miles” field into kilometers and throw a validation error if the payload is ambiguous.
-* **Internally, use a single canonical representation** (e.g. always store distances as floating-point kilometers). Then, conversion to other units happens only at the last possible moment (e.g. rendering a view, serializing a CSV, or generating an external report).
+- **Internally, use a single canonical representation** (e.g. always store distances as floating-point kilometers). Then, conversion to other units happens only at the last possible moment (e.g. rendering a view, serializing a CSV, or generating an external report).
 
 If you centralize conversions, you eliminate most of the scatter: you don’t need to brand every single distance in business logic. Instead, you have something like:
 
@@ -127,9 +131,9 @@ export class Distance {
 
 Now:
 
-* Any code that **produces** a distance (say, user input) must decide up front if it’s in miles or kilometers (via `Distance.fromMiles(…)` or `Distance.fromKilometers(…)`).
-* Anywhere else in the application, you carry around a single `Distance` object. You never accidentally pass a `Distance` where a mile or kilometer is expected—it’s always a `Distance`.
-* Conversions happen in one place, inside `Distance`. You don’t clutter every service or controller with unit checks.
+- Any code that **produces** a distance (say, user input) must decide up front if it’s in miles or kilometers (via `Distance.fromMiles(…)` or `Distance.fromKilometers(…)`).
+- Anywhere else in the application, you carry around a single `Distance` object. You never accidentally pass a `Distance` where a mile or kilometer is expected—it’s always a `Distance`.
+- Conversions happen in one place, inside `Distance`. You don’t clutter every service or controller with unit checks.
 
 This approach ensures that the “unit-awareness” is localized inside a single value object. There are no tiny `{ type: "mile", value }` blobs everywhere. Instead, your domain model enforces that each `Distance` is always internally consistent.
 
@@ -138,11 +142,11 @@ This approach ensures that the “unit-awareness” is localized inside a single
 Imagine you have dozens of unit conversions—temperature (°C ↔ °F), volume (liters ↔ gallons), weight (kg ↔ lb), pressure (Pa ↔ psi), and so on. If every one of these is enforced by wrapping primitives into `{ type: …; value: number }`, you end up with a forest of tiny types:
 
 ```ts
-type Celsius = { type: "celsius"; value: number };
-type Fahrenheit = { type: "fahrenheit"; value: number };
+type Celsius = { type: 'celsius'; value: number };
+type Fahrenheit = { type: 'fahrenheit'; value: number };
 
-type Liters = { type: "liters"; value: number };
-type Gallons = { type: "gallons"; value: number };
+type Liters = { type: 'liters'; value: number };
+type Gallons = { type: 'gallons'; value: number };
 
 // … and so on …
 ```
@@ -161,15 +165,15 @@ When the real problem is that you don’t have a proper “Unit” abstraction o
 
 By relegating “unit correctness” to a low-level type trick, you might miss the fact that unit conversions often signal domain logic that deserves more explicit treatment. For example:
 
-* Are “miles” and “kilometers” 100% interchangeable in your business? Maybe clients in different regions always think in their local units, and storing in one canonical unit loses meaning.
-* Perhaps you need to display both units side‐by‐side, or persist the original user‐submitted unit. In that case, a trivial “`value * 1.60934`” conversion might erase important context.
+- Are “miles” and “kilometers” 100% interchangeable in your business? Maybe clients in different regions always think in their local units, and storing in one canonical unit loses meaning.
+- Perhaps you need to display both units side‐by‐side, or persist the original user‐submitted unit. In that case, a trivial “`value * 1.60934`” conversion might erase important context.
 
 A richer domain model might be:
 
 ```ts
 interface DistanceDTO {
   originalValue: number;
-  originalUnit: "mile" | "kilometer";
+  originalUnit: 'mile' | 'kilometer';
 }
 
 class Distance {
@@ -178,7 +182,7 @@ class Distance {
 
   constructor(dto: DistanceDTO) {
     this.original = dto;
-    if (dto.originalUnit === "mile") {
+    if (dto.originalUnit === 'mile') {
       this.kilometers = dto.originalValue * 1.60934;
     } else {
       this.kilometers = dto.originalValue;
@@ -220,8 +224,8 @@ This lets you always trace back to the user’s original intent. If, six months 
 
 It’s worth acknowledging that TypeScript’s “branded” or “nominal” types can be a quick way to get immediate safety, _without the extra data on an object_. If you’re shipping a small library and you know for sure the only three units you care about are `mile`, `kilometer`, and perhaps `nautical mile`, then:
 
-* You get compile-time checks without pulling in a heavier dependency.
-* You can still later refactor into a richer `Distance` class when complexity grows.
+- You get compile-time checks without pulling in a heavier dependency.
+- You can still later refactor into a richer `Distance` class when complexity grows.
 
 For example:
 
@@ -229,17 +233,15 @@ For example:
 // A “brand” helper for nominal typing
 type Brand<K, T> = K & { __brand: T };
 
-export type Mile = Brand<number, "mile">;
-export type Kilometer = Brand<number, "kilometer">;
+export type Mile = Brand<number, 'mile'>;
+export type Kilometer = Brand<number, 'kilometer'>;
 
 export const asMiles = (value: number): Mile => value as Mile;
 export const asKilometers = (value: number): Kilometer => value as Kilometer;
 
-export const convertMilesToKm = (m: Mile): Kilometer =>
-  asKilometers((m as number) * 1.60934);
+export const convertMilesToKm = (m: Mile): Kilometer => asKilometers((m as number) * 1.60934);
 
-export const convertKmToMiles = (km: Kilometer): Mile =>
-  asMiles((km as number) / 1.60934);
+export const convertKmToMiles = (km: Kilometer): Mile => asMiles((km as number) / 1.60934);
 ```
 
 Here, you still carry around raw numbers at runtime, but critically no extra JS objects. The TypeScript system enforces that only a “`Brand<number, "mile">`” can go into `convertMilesToKm` at compile time. This is more lightweight than an object with `{ type: "mile"; value: number }`, and it’s still fairly ergonomic. But note: **it remains a tool to catch programmer mistakes, not a replacement for thoughtful domain modeling**.
@@ -256,4 +258,4 @@ However, in my view this approach often treats the symptom rather than the root 
 2. **Centralize all conversions and formatting** in one place (e.g., a `Distance` class or a small “unit conversion” library).
 3. **Use domain entities/value objects** to capture provenance, validation, and formatting rules.
 
-In short, type safety is important, but it’s no substitute for good architecture. If you always wrap raw numbers inside a branded type or a small object just to “remember the unit”, think instead: *Why do I have unitless numbers in the first place?* or *Why am I doing this conversion here?*. If you can eliminate that ambiguity by raising your unit into a first-class concept (like "Distance"), you’ll find your code is clearer, more maintainable, and less reliant on type tricks.
+In short, type safety is important, but it’s no substitute for good architecture. If you always wrap raw numbers inside a branded type or a small object just to “remember the unit”, think instead: _Why do I have unitless numbers in the first place?_ or _Why am I doing this conversion here?_. If you can eliminate that ambiguity by raising your unit into a first-class concept (like "Distance"), you’ll find your code is clearer, more maintainable, and less reliant on type tricks.

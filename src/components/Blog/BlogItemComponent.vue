@@ -1,8 +1,11 @@
 <template>
   <div class="blog-item" @click="emit('click', blog)" style="cursor: pointer">
-    -
-    <strong>{{ blog.title }}</strong>
-    <span v-if="blog.date"> ({{ blog.date }})</span>
+    <p>
+      -
+      <strong>{{ blog.title }}</strong>
+      <span v-if="blog.date"> ({{ blog.date }})</span>
+    </p>
+    <p v-if="blog.markdown.summary">{{ blog.markdown.summary }}</p>
   </div>
 </template>
 
@@ -19,6 +22,11 @@ const emit = defineEmits<{
 .blog-item {
   padding: 0.5rem;
   border-bottom: 1px solid #ccc;
+}
+
+strong {
+  font-weight: bold;
+  font-size: 1.5rem;
 }
 
 .blog-item:hover {

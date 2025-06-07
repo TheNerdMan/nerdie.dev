@@ -9,7 +9,7 @@
         <div v-else>
           <h2>{{ localBlog.title }}</h2>
           <p v-if="localBlog.date">Published on: {{ localBlog.date }}</p>
-          <MarkdownRendererComponent :content="localBlog.content" />
+          <MarkdownRendererComponent :content="localBlog.markdown.content" />
         </div>
         <transition name="fade-up">
           <button v-if="showBackToTop && isMobile" class="back-to-top" @click="scrollToTop">

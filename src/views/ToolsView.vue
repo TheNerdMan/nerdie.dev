@@ -4,23 +4,30 @@ import { RouterLink } from 'vue-router';
 
 <template>
   <header>
-    <h1>This is a work in progress! Please go back (or remind me to finish it on discord @thenerdman)</h1>
+    <h1>This is a work in progress! <RouterLink to="/"> Please go back </RouterLink> 😊</h1>
+    <p>(or remind me to finish it on discord @thenerdman)</p>
   </header>
   <main>
     <h1>Tools</h1>
     <h2>I've built</h2>
     <ul>
-      <li><a href="" target="_blank" rel="noopener noreferrer">Tool 1</a></li>
-      <li><a href="" target="_blank" rel="noopener noreferrer">Tool 2</a></li>
+      <li>Unfortunately most of the tools I've built are IP of my employers</li>
+    </ul>
+    <h2>I've helped</h2>
+    <ul>
+      <li>
+        <a href="https://github.com/momentum-mod/website" target="_blank" rel="noopener noreferrer"
+          >Momentum Mod - Website/API</a
+        >
+      </li>
     </ul>
     <h2>I use</h2>
     <ul>
-      <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">Tool 3</a></li>
-      <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">Tool 4</a></li>
-      <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">Tool 5</a></li>
+      <li>
+        <a href="https://gitmoji.dev/" target="_blank" rel="noopener noreferrer"
+          >Gitmoji, because yes, emojis should be in git commits too</a
+        >
+      </li>
     </ul>
   </main>
-  <footer>
-    <RouterLink to="/"> Home </RouterLink>
-  </footer>
 </template>

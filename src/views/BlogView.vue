@@ -1,11 +1,8 @@
 <template>
   <div class="blog-header">
-    <h1>
-      Sometimes I write things, however most of the time my opinion has changed since writing them
-    </h1>
+    <h1>The ramblings of a developer who is regularly nerd-sniped</h1>
     <p>
-      Hopefully watching my journey of changing opinion about how I write code (or at least want to
-      write code)
+      Watch my journey of changing opinion about how I write code (or at least want to write code)
     </p>
   </div>
   <div class="blog-list">
@@ -24,6 +21,7 @@ import { ref, onMounted } from 'vue';
 import BlogItemComponent from '@/components/Blog/BlogItemComponent.vue';
 import type { BlogFile } from '@/utils/types/BlogItem.type';
 import BlogViewerComponent from '@/components/Blog/BlogViewerComponent.vue';
+import { CustomMarkdownParser } from '@/utils/classes/CustomMarkDownParser.class';
 import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
@@ -40,7 +38,7 @@ const blogs = ref<BlogFile[]>(
     const match = path.match(/blogs\/(\d{4})\/(\d{4}-\d{2}-\d{2})-(.+)\.md$/);
     return {
       path,
-      content: content as string,
+      markdown: new CustomMarkdownParser(content as string),
       year: match ? match[1] : '',
       date: match ? match[2] : '',
       slug: match ? match[3] : '',
